@@ -1,4 +1,5 @@
 const ALLOWED_ORIGINS = [
+  "127.0.0.1",
   "creativeu.live",
   "creativeu-app.live",
   //"http://creativeu2-env.eba-h38mfdrw.us-east-2.elasticbeanstalk.com", //original environment

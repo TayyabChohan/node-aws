@@ -6,57 +6,13 @@ const path = require("path");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
-const PORT = process.env.PORT || 4242;
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+
+
 const app = express();
 const wsInstance = enableWs(app);
 const rateLimit = require("express-rate-limit");
 const { ALLOWED_WEBHOOK_IP_ADDRESSES } = require("./constants/constants");
-
-//require dotenv file for stripe keys
-require("dotenv").config({ path: "./.env" });
-const { ALLOWED_ORIGINS } = require("./constants/constants");
-
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2020-08-27",
-  //   appInfo: {
-  //     // For sample support and debugging, not required for production:
-  //     name: "stripe-samples/subscription-use-cases/fixed-price",
-  //     version: "0.0.1",
-  //     url: "https://github.com/stripe-samples/subscription-use-cases/fixed-price",
-  //   },
-});
-
-//development
-if (process.env.NODE_ENV === "development") {
-  app.use(cors());
-} else {
-  //production && staging
-  app.use(
-    cors({
-      //may need to add "credentials: true," so that csurf routes work properly
-      origin: function (origin, callback) {
-        // allow requests with no origin
-        // (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        //NEED TO VERIFY THAT THIS WORKS AS EXPECTED
-        if (ALLOWED_ORIGINS.indexOf(origin.split("//")[1]) === -1) {
-          var msg =
-            "The CORS policy for this site does not " +
-            "allow access from the specified Origin: " +
-            origin;
-          return callback(new Error(msg), false);
-        }
-        return callback(null, true);
-      },
-    })
-  );
-}
-
-// the site is hosted on cloudflare, so the nginx file in the EC2 instance had to be updated to include cloudflare IP addresses and
-// set this header
-app.get("/ip", (request, response) =>
-  response.send(request.headers["cf-connecting-ip"])
-);
 
 app.use(fileUpload({ useTempFiles: false }));
 
@@ -91,7 +47,7 @@ if (process.env.NODE_ENV !== "development") {
 let clients = {};
 
 // API routes - require webhook route before csurf and csurf before everything else
-require("./routes/stripe-webhook")(app, stripe);
+// require("./routes/stripe-webhook")(app, stripe);
 require("./routes/csurf-routes.js")(app);
 
 //now apply rate limiters
@@ -121,15 +77,15 @@ app.use(SlowBruteForceLimiter);
 
 require("./routes/contact-us-routes")(app);
 require("./routes/uri-safety-routes")(app);
-require("./routes/user-routes")(app, stripe);
-require("./routes/moderator-routes")(app, stripe);
-require("./routes/media-routes")(app, stripe);
+// require("./routes/user-routes")(app, stripe);
+// require("./routes/moderator-routes")(app, stripe);
+// require("./routes/media-routes")(app, stripe);
 require("./routes/geocoder-routes")(app);
 require("./routes/search-routes")(app);
 require("./routes/message-routes")(app, clients);
 require("./routes/event-request-routes")(app, clients);
 require("./routes/calendar-routes")(app);
-require("./routes/subscription-routes")(app, stripe);
+// require("./routes/subscription-routes")(app, stripe);
 require("./routes/websocket-routes")(app, clients);
 require("./routes/join-code-routes")(app);
 // require("./routes/shop-routes")(app);
@@ -142,16 +98,12 @@ app.get("/*", (req, res) => {
 // //connect to the db
 
   console.log('try')
-  mongoose.connect(
-    process.env.NODE_ENV === "development"
-      ? "mongodb://localhost:27017/creativeu_db"
-      : `mongodb+srv://WebifyDev:${process.env.ATLAS_PASSWORD}@creativeucluster.wvuoo.mongodb.net/CreativeU?retryWrites=true&w=majority`
-  );
+//   mongoose.connect(
+//     process.env.NODE_ENV === "development"
+//       ? "mongodb://localhost:27017/creativeu_db"
+//       : `mongodb+srv://WebifyDev:${process.env.ATLAS_PASSWORD}@creativeucluster.wvuoo.mongodb.net/CreativeU?retryWrites=true&w=majority`
+//   );
 
-
-
-app.listen(PORT, () => {
-  console.log(
-    `SUCCESSFULLY LAUNCHED SERVER ==> API server now on port ${PORT}!`
-  );
-});
+mongoose.connect('mongodb://localhost:27017/test-db').then(() => console.log("Connected to mongodb")).catch(error => console.log(error))
+const port = process.env.PORT || 5001;
+app.listen(port , () => console.log("App is listinign on port 5001"))
