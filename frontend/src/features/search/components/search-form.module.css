@@ -1,0 +1,163 @@
+.searchOuterContainer {
+  position: relative;
+}
+
+.searchOuterContainer label {
+  color: white;
+}
+
+.searchForm div select {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.searchInputContainer {
+  display: flex;
+  flex-direction: row;
+  border-radius: 20px;
+  border: 2px solid white;
+  padding: 6px;
+  height: 20px;
+  position: relative;
+}
+
+.navbarSearchInputContainer {
+  width: 212px;
+}
+
+.searchScreenInputContainer {
+  width: 360px;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+.searchInput {
+  height: 20px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.buttonContainer {
+  display: flex;
+  padding-right: 8px;
+  position: absolute;
+  top: 7px;
+  right: 0;
+}
+
+.settingsCog:hover {
+  cursor: pointer;
+}
+
+.searchBtn:hover {
+  cursor: pointer;
+}
+
+.settingsDropdown {
+  position: absolute;
+  top: 36px;
+  right: 0px;
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  background-color: #121212;
+  padding: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: end;
+}
+
+.userLocationLabel {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.settingsInput {
+  height: 20px;
+  margin-top: 16px;
+  background-color: #121212;
+  border: none;
+  border-bottom: 2px solid white;
+  color: white;
+  outline: none;
+  margin-right: 4px;
+  display: inline-block;
+}
+
+.fadeIn {
+  animation: fadeIn 250ms ease-in-out 1 forwards;
+}
+
+.fadeOut {
+  animation: fadeOut 250ms ease-in-out 1 forwards;
+}
+
+.autocomplete {
+  background-color: #121212;
+  border: 2px solid white;
+  padding: 4px;
+  color: white;
+  font-family: "Noto Sans Display";
+}
+
+/* going to have to change this for the search screen version */
+/* @media screen and (max-width: 896px) {
+  .settingsDropdown {
+    top: -4px;
+    left: 210px;
+  }
+} */
+
+@media screen and (max-width: 399px) {
+  .searchScreenInputContainer {
+    width: 300px;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    visibility: hidden;
+  }
+  1% {
+    visibility: visible;
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  99% {
+    opacity: 0;
+  }
+  100% {
+    visibility: hidden;
+  }
+}
+
+.errorMessage {
+  margin-left: 12px;
+  color: transparent;
+  animation: error-text 250ms ease-in-out 1 forwards;
+}
+
+@keyframes error-text {
+  from {
+    color: transparent;
+  }
+  to {
+    color: rgba(220, 20, 60, 0.5);
+  }
+}

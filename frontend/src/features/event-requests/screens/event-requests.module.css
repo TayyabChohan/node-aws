@@ -1,0 +1,90 @@
+.eventRequestsScreen {
+  width: 99vw;
+  min-height: 100vh;
+  padding-top: 92px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+}
+
+.eventRequestsInnerContainer {
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heading {
+  font-family: "Permanent Marker";
+  color: white;
+  text-align: center;
+}
+
+.requestTypeBreadcrumb {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px;
+  width: 200px;
+}
+
+.requestTypeBtn {
+  background-color: transparent;
+  color: white;
+  font-family: "Noto Sans Display";
+  font-size: 18px;
+  border: none;
+  outline: none;
+}
+
+.requestTypeSelected {
+  border-bottom: 3px solid white;
+  font-weight: bold;
+}
+
+.requests {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.request {
+  /* width: 500px; */
+  color: white;
+  border-bottom: 2px solid #2e2e2e;
+  font-family: "Noto Sans Display";
+  margin: none;
+  padding: 4px;
+  padding-left: 12px;
+  padding-right: 12px;
+  box-sizing: border-box;
+}
+
+.request:hover {
+  cursor: pointer;
+  background-color: #2e2e2e;
+}
+
+.responsiveText {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media screen and (max-width: 768px) {
+  .eventRequestsInnerContainer {
+    padding: 0px;
+  }
+
+  .responsiveText {
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .request {
+    width: 280px;
+  }
+}

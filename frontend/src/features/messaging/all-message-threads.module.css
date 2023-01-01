@@ -1,0 +1,54 @@
+.screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 80px;
+  box-sizing: border-box;
+}
+
+.messageThreads {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+}
+
+.messageThread {
+  display: flex;
+  align-items: center;
+  width: 370px;
+  max-width: 100%;
+  box-sizing: border-box;
+  color: white;
+  font-family: "Noto Sans Display";
+  background-color: #303030;
+  padding: 4px;
+  position: relative;
+  text-overflow: ellipsis;
+}
+
+.messageThread:hover {
+  background-color: #5c5c5c;
+}
+
+.newMessageTextContainer {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.newMessageText {
+  text-decoration: none !important;
+  color: yellow;
+  background-color: #008080;
+  margin: 0;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 10px;
+  padding-right: 10px;
+  box-shadow: 2px 2px 0px black;
+}

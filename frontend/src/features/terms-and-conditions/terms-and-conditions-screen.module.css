@@ -1,0 +1,14 @@
+.termsAndConditionsScreen {
+  color: white;
+  font-family: "Noto Sans Display";
+  margin-top: 80px;
+  display: flex;
+  justify-content: center;
+}
+
+.innerContainer {
+  width: 800px;
+  max-width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
