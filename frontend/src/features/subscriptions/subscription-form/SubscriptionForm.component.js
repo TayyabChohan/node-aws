@@ -91,7 +91,9 @@ const SubscriptionInnerForm = ({ clientSecret }) => {
       toast.success(`$${pricePlan} has been Deducted from Credit Card.`);
       console.log(user, "tayayayayyayab");
       // registerRequestUpdate(user)
-      history.push("/");
+      setTimeout(() => {
+        history.push("/");
+      }, 2000);
     }
     if (isSubscription?.messages?.resultCode === "Error") {
       toast.warning(isSubscription?.messages?.message[0]?.text);

@@ -30,8 +30,8 @@ module.exports = function (app) {
     );
 
     var billTo = new ApiContracts.CustomerAddressType();
-    billTo.setFirstName(req.body.fname ? req.body.fname : req.body.user.fname);
-    billTo.setLastName(req.body.lname ? req.body.lname : req.body.user.lname);
+    billTo.setFirstName(req.body?.fname ? req.body?.fname : req.body?.user?.fname);
+    billTo.setLastName(req.body?.lname ? req.body?.lname : req.body?.user?.lname);
     billTo.setAddress(
       req.body.streetAddressLine1
         ? req.body.streetAddressLine1
