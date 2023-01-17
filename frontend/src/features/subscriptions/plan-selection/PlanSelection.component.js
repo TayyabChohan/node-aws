@@ -119,7 +119,8 @@ export const PlanSelection = () => {
         )}
       </div>
       <button
-        className="btn"
+      style={{width:"120px"}}
+        className="form-control"
         disabled={!selectedPlan}
         onClick={() => {
           setShowModal(true);

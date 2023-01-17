@@ -295,7 +295,8 @@ export const ArtistInfoForm = ({ parentFormData, setParentPage }) => {
       </div>
       <p className={styles.errorMessage}>{error}</p>
       <button
-        className={`btn ${styles.nextBtn}`}
+        className="form-control"
+        style={{width:"100px"}}
         onClick={async (event) => {
           event.preventDefault();
           let checkPassed = true;

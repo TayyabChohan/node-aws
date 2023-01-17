@@ -288,7 +288,7 @@ const UserSchema = new Schema({
 //ensure that all fields that must be unique are unique
 // UserSchema.plugin(uniqueValidator);
 
-UserSchema.plugin(jumblator, { secret: process.env.MONGOOSE_SECRET });
+// UserSchema.plugin(jumblator, { secret: process.env.MONGOOSE_SECRET });
 
 //before saving the user's password to the db, hash it
 UserSchema.pre("save", function (next) {

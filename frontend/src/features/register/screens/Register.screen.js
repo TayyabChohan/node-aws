@@ -23,7 +23,7 @@ export const RegisterScreen = () => {
   const code = params.get("accountexec");
   const referrer = params.get("referrer");
   const promoCode = params.get("joincode");
-
+  console.log(promoCode, referrer, code, params, queryString, "tayyab");
   useEffect(() => {
     window.scrollTo(0, 0);
     if (!code) setIsLoading(false);
@@ -86,8 +86,10 @@ export const RegisterScreen = () => {
                         <option value="resource">resource</option>
                       </select>
                     </label>
+                    <br/>
                     <button
-                      className={`btn ${styles.nextBtn}`}
+                      style={{ width: "120px" }}
+                      className="form-control"
                       onClick={() => {
                         if (formToShow) {
                           setShowForm(true);

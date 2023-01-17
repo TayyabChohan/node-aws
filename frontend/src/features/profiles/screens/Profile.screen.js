@@ -123,14 +123,14 @@ export const Profile = () => {
           }}
         />
 
-        <div className={styles.headingContainer}>
-          <div className={styles.headingTextContainer}>
-            <h1 className={styles.heading}>{user.displayName}</h1>
-            <h2 className={styles.subheading}>
-              {user.category}
-              {user.tags.map((t, i) => {
+        <div className={styles?.headingContainer}>
+          <div className={styles?.headingTextContainer}>
+            <h1 className={styles?.heading}>{user?.displayName}</h1>
+            <h2 className={styles?.subheading}>
+              {user?.category}
+              {user?.tags?.map((t, i) => {
                 return (
-                  <span className={styles.tag} key={t}>
+                  <span className={styles?.tag} key={t}>
                     {i !== 0 ? "| " : ""}
                     {t}
                   </span>

@@ -2,18 +2,18 @@ const express = require("express");
 const enableWs = require("express-ws");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const dotEnv = require("dotenv");
 const path = require("path");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
-
-
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const app = express();
+dotEnv.config();
 const wsInstance = enableWs(app);
 const rateLimit = require("express-rate-limit");
 const { ALLOWED_WEBHOOK_IP_ADDRESSES } = require("./constants/constants");
-
+//  console.log(stripe,'strihgjhgjhgpe')
 app.use(fileUpload({ useTempFiles: false }));
 
 // Define middleware here
@@ -28,7 +28,6 @@ app.use((req, res, next) => {
     if (ALLOWED_WEBHOOK_IP_ADDRESSES.includes(IP)) {
       next();
     } else {
-      console.log("UNAUTHORIZED ATTEMPT AT ACCESSING WEBHOOK");
       res.status(403).send("UNAUTHORIZED ATTEMPT AT ACCESSING WEBHOOK");
     }
   } else {
@@ -37,8 +36,8 @@ app.use((req, res, next) => {
 });
 
 //use cookie-parser for authentication cookies
+app.use(cors());
 app.use(cookieParser(process.env.COOKIE_SECRET));
-
 // Serve up static assets
 if (process.env.NODE_ENV !== "development") {
   app.use(express.static("client/build"));
@@ -48,7 +47,7 @@ let clients = {};
 
 // API routes - require webhook route before csurf and csurf before everything else
 // require("./routes/stripe-webhook")(app, stripe);
-require("./routes/csurf-routes.js")(app);
+// require("./routes/csurf-routes.js")(app);
 
 //now apply rate limiters
 const DDOSPrevention = rateLimit({
@@ -75,20 +74,38 @@ const SlowBruteForceLimiter = rateLimit({
 app.use(DDOSPrevention);
 app.use(SlowBruteForceLimiter);
 
+// require("./routes/contact-us-routes")(app);
+// require("./routes/uri-safety-routes")(app);
+// // require("./routes/user-routes")(app, stripe);
+// // require("./routes/moderator-routes")(app, stripe);
+// // require("./routes/media-routes")(app, stripe);
+// require("./routes/geocoder-routes")(app);
+// require("./routes/search-routes")(app);
+// require("./routes/message-routes")(app, clients);
+// require("./routes/event-request-routes")(app, clients);
+// require("./routes/calendar-routes")(app);
+// // require("./routes/subscription-routes")(app, stripe);
+// require("./routes/websocket-routes")(app, clients);
+// require("./routes/join-code-routes")(app);
+
 require("./routes/contact-us-routes")(app);
 require("./routes/uri-safety-routes")(app);
-// require("./routes/user-routes")(app, stripe);
-// require("./routes/moderator-routes")(app, stripe);
-// require("./routes/media-routes")(app, stripe);
+require("./routes/AuthPaymentMethod-routes")(app);
+require("./routes/authSubscription-routes")(app);
+require("./routes/user-routes")(app, stripe);
+require("./routes/moderator-routes")(app, stripe);
+require("./routes/media-routes")(app, stripe);
+require("./routes/subscription-routes")(app, stripe);
 require("./routes/geocoder-routes")(app);
 require("./routes/search-routes")(app);
 require("./routes/message-routes")(app, clients);
 require("./routes/event-request-routes")(app, clients);
 require("./routes/calendar-routes")(app);
-// require("./routes/subscription-routes")(app, stripe);
 require("./routes/websocket-routes")(app, clients);
 require("./routes/join-code-routes")(app);
-// require("./routes/shop-routes")(app);
+require("./routes/shop-routes")(app);
+require("./routes/authCreateCustomer-routes")(app);
+require("./routes/authChargeCredit-routes")(app);
 
 // Send every other request to the React app
 // Define any API routes before this runs
@@ -97,13 +114,17 @@ app.get("/*", (req, res) => {
 });
 // //connect to the db
 
-  console.log('try')
 //   mongoose.connect(
 //     process.env.NODE_ENV === "development"
 //       ? "mongodb://localhost:27017/creativeu_db"
 //       : `mongodb+srv://WebifyDev:${process.env.ATLAS_PASSWORD}@creativeucluster.wvuoo.mongodb.net/CreativeU?retryWrites=true&w=majority`
 //   );
+const url = `mongodb+srv://creativeu_db:creativeu_db@cluster0.dtr7api.mongodb.net/?retryWrites=true&w=majority`;
 
-mongoose.connect('mongodb://localhost:27017/test-db').then(() => console.log("Connected to mongodb")).catch(error => console.log(error))
+mongoose
+  // .connect("mongodb://localhost:27017/test-db")
+  .connect(url)
+  .then(() => console.log("Connected to mongodb"))
+  .catch((error) => console.log(error));
 const port = process.env.PORT || 5001;
-app.listen(port , () => console.log("App is listinign on port 5001"))
+app.listen(port, () => console.log("App is listinign on port 5001"));

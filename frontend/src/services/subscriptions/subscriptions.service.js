@@ -1,12 +1,18 @@
 import axios from "axios";
 
 export const createSubscription = async (customerId, priceId) => {
+  console.log(customerId, priceId, "customerId, priceId");
   return new Promise(async (resolve, reject) => {
     try {
-      const res = await axios.post("/payments/create-subscription", {
-        customerId,
-        priceId,
-      });
+     
+      const res = await axios.post(
+        "/payments/create-subscription",
+        {
+          customerId,
+          priceId,
+        },
+        // { headers: headers }
+      );
       resolve({
         subscriptionId: res.data.subscriptionId,
         clientSecret: res.data.clientSecret,

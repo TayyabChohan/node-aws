@@ -705,7 +705,8 @@ export const TermsAndConditions = ({ acceptTermsAndConditions, closeSelf }) => {
           <p>{error}</p>
           <div className={styles.btnRow}>
             <button
-              className="btn"
+              style={{ width: "250px" }}
+              className="form-control"
               onClick={() => {
                 if (agreeToTerms) {
                   acceptTermsAndConditions();

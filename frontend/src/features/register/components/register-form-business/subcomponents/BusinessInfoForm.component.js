@@ -18,11 +18,12 @@ export const BusinessInfoForm = ({ parentFormData, setParentPage }) => {
     category: parentFormData.current.category,
     tags: parentFormData.current.tags,
   });
+
   const [tagToAdd, setTagToAdd] = useState(null);
 
   const [emailError, setEmailError] = useState("");
   const [error, setError] = useState("");
-
+  console.log(formData, "formData");
   const validateEmail = (email) => {
     return new Promise(async (resolve, reject) => {
       if (email.length === 0) {
@@ -262,7 +263,9 @@ export const BusinessInfoForm = ({ parentFormData, setParentPage }) => {
         onClick={async (event) => {
           event.preventDefault();
           let checkPassed = true;
+          console.log(formData.email,'formData.email')
           const validEmail = await validateEmail(formData.email);
+          console.log(validEmail,'valid email')
           if (!validEmail) {
             const input = document.getElementById("email");
             input.classList.add(`${styles.required}`);

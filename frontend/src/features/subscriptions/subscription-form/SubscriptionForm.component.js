@@ -1,55 +1,231 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
-import {
-  Elements,
-  useStripe,
-  useElements,
-  PaymentElement,
-} from "@stripe/react-stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 import { AuthenticationContext } from "../../../services/authentication/authentication.context";
 import { SubscriptionsContext } from "../../../services/subscriptions/subscriptions.context";
 import { ContentBox } from "../../../components/content-box/ContentBox.component";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Redirect, useHistory } from "react-router-dom";
 
 const SubscriptionInnerForm = ({ clientSecret }) => {
-  const { user, setUser } = useContext(AuthenticationContext);
-  const { planType } = useContext(SubscriptionsContext);
+  const { user } = useContext(AuthenticationContext);
+  const { planType, setPlen } = useContext(SubscriptionsContext);
+  const initialvalues = { cc: "", cvv: "", expire: "" };
+  const [isresult, setResult] = useState({});
+  const [isSubscription, setResultSubscription] = useState({});
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [formValues, setFormValues] = useState(initialvalues);
+  const [formErrors, setFormErrors] = useState({});
+  const { cc, cvv, expire } = formValues;
+  let pricePlan = "";
+  if (planType === "monthly") {
+    pricePlan = "32.59";
+  } else if (planType === "yearly") {
+    pricePlan = "271.56";
+  } else {
+    pricePlan = "1629.38";
+  }
+  let history = useHistory();
+  const registerRequestUpdate = (userObj) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const res = await axios.post("/register_update", {
+          ...userObj,
+        });
+        const { user } = res.data;
+        resolve(user);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
+  const checkoutmethod = async (data) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const res = await axios.post("/checkout-method", {
+          cc: data.cc,
+          cvv: data.cvv,
+          expire: data.expire,
+          amount: pricePlan,
+          messages: data?.messages,
+          subscriptionId: data?.subscriptionId,
+          profile: data?.profile,
+          user: user._doc,
+          ///////// user Info/////
+          type: user.type,
+          category: user.category,
+          cell: user.cell,
+          city: user.city,
+          country: user.country,
+          createdAt: user.createdAt,
+          displayName: user.displayName,
+          email: user.email,
+          fname: user.fname,
+          lat: user.lat,
+          lname: user.lname,
+          lng: user.lng,
+          paymentFailed: user.paymentFailed,
+          postalCode: user.postalCode,
+          profileUrl: user.profileUrl,
+          secret: user.secret,
+          stateOrProvince: user.stateOrProvince,
+          streetAddressLine1: user.streetAddressLine1,
+          stripeAccountID: user.stripeAccountID,
+          stripeCustomerID: user.stripeCustomerID,
+        });
+        resolve(setResult(res?.data));
+      } catch (e) {
+        reject(setResult(e));
+        toast.error(e.message);
+      }
+    });
+  };
 
-  const stripe = useStripe();
-  const elements = useElements();
+  // useEffect(() => {
+  //   registerRequestUpdate(user ? user : user._doc);
+  // },);
+  useEffect(() => {
+    if (isresult?.messages?.resultCode === "Ok") {
+      toast.success(`$${pricePlan} has been Deducted from Credit Card.`);
+      console.log(user, "tayayayayyayab");
+      // registerRequestUpdate(user)
+      history.push("/");
+    }
+    if (isSubscription?.messages?.resultCode === "Error") {
+      toast.warning(isSubscription?.messages?.message[0]?.text);
+    }
+  }, [isresult]);
+  const createSubscription = async (infoData) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const res = await axios.post("/create-subscription-authorize", {
+          cc: infoData.cc,
+          cvv: infoData.cvv,
+          expire: infoData.expire,
+          amount: pricePlan,
+          planType: planType,
+          user: user._doc,
+          ///////user Info///////
+          type: user.type,
+          category: user.category,
+          cell: user.cell,
+          city: user.city,
+          country: user.country,
+          createdAt: user.createdAt,
+          displayName: user.displayName,
+          email: user.email,
+          fname: user.fname,
+          lat: user.lat,
+          lname: user.lname,
+          lng: user.lng,
+          paymentFailed: user.paymentFailed,
+          postalCode: user.postalCode,
+          profileUrl: user.profileUrl,
+          secret: user.secret,
+          stateOrProvince: user.stateOrProvince,
+          streetAddressLine1: user.streetAddressLine1,
+          stripeAccountID: user.stripeAccountID,
+          stripeCustomerID: user.stripeCustomerID,
+        });
+        resolve(setResultSubscription(res.data));
+      } catch (e) {
+        reject(setResultSubscription(e));
+      }
+    });
+  };
 
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
+  };
   const handleSubmit = async (event) => {
     // We don't want to let default form submission happen here,
     // which would refresh the page.
     event.preventDefault();
+    const data = {
+      cc: cc,
+      cvv: cvv,
+      expire: expire,
+      amount: pricePlan,
+    };
 
-    //disable the button
-    const submitBtn = document.getElementById("stripe-payment-button");
-    submitBtn.disabled = true;
-
-    if (!stripe || !elements) {
-      // Stripe.js has not yet loaded.
-      // Make sure to disable form submission until Stripe.js has loaded.
-      return;
-    }
-
-    const result = await stripe.confirmPayment({
-      //`Elements` instance that was used to create the Payment Element
-      elements,
-      confirmParams: {
-        return_url: "https://creativeu.live/profile",
-      },
-      redirect: "if_required",
-    });
-
-    if (result.error) {
-      // Show error to your customer (for example, payment details incomplete)
-      alert(
-        "The payment has failed. Please try again later, or try a different payment method."
-      );
-    } else {
-      setUser({ ...user, accountActive: true });
+    if (data) {
+      setFormErrors(validate(formValues));
+      setIsSubmit(true);
     }
   };
+  useEffect(() => {
+    if (Object.keys(formErrors).length === 0 && isSubmit) {
+      createSubscription(formValues);
+    }
+    if (isSubscription?.messages?.resultCode === "Error") {
+      toast.warning(isSubscription?.messages?.message[0]?.text);
+    }
+  }, [formErrors]);
+
+  const validate = (values) => {
+    const errors = {};
+
+    var visaRegEx = /^(?:4[0-9]{12}(?:[0-9]{3})?)$/;
+    var mastercardRegEx = /^(?:5[1-5][0-9]{14})$/;
+    var amexpRegEx = /^(?:3[47][0-9]{13})$/;
+    var discovRegEx = /^(?:6(?:011|5[0-9][0-9])[0-9]{12})$/;
+    var isValid = false;
+    if (!values.cc) {
+      errors.cc = "cc is required!";
+    }
+    if (visaRegEx.test(values.cc)) {
+      isValid = true;
+    } else if (mastercardRegEx.test(values.cc)) {
+      isValid = true;
+    } else if (amexpRegEx.test(values.cc)) {
+      isValid = true;
+    } else if (discovRegEx.test(values.cc)) {
+      isValid = true;
+    }
+
+    if (isValid) {
+    } else {
+      errors.cc = "Invalid cc code.";
+    }
+
+    if (!values.cvv) {
+      errors.cvv = "cvv is required!";
+    } else if (!/^\d{3}$/.test(values.cvv)) {
+      errors.cvv = "Invalid CVV code.";
+    }
+    if (!values.expire) {
+      errors.expire = "Expire is required!";
+    } else if (!/^\d{4}$/.test(values.expire)) {
+      errors.expire = "Invalid expiration date.";
+    }
+
+    return errors;
+  };
+
+  useEffect(() => {
+    const checkOutData = {
+      cc: cc,
+      cvv: cvv,
+      expire: expire,
+      amount: pricePlan,
+      messages: isSubscription?.messages,
+      subscriptionId: isSubscription?.subscriptionId,
+      profile: isSubscription?.profile,
+    };
+    if (isSubscription?.messages?.resultCode === "Ok") {
+      toast.success(`Your ${planType} plan has been subscribed.`);
+      checkoutmethod(checkOutData);
+    }
+    if (isSubscription?.messages?.resultCode === "Error") {
+      toast.warning(isSubscription?.messages?.message[0]?.text);
+    }
+  }, [isSubscription]);
 
   return (
     <form
@@ -107,16 +283,60 @@ const SubscriptionInnerForm = ({ clientSecret }) => {
           Payment Information
         </h3>
         <div style={{ backgroundColor: "white", padding: "20px" }}>
-          <PaymentElement />
+          <div className="form-control">
+            <label for="cc">Credit Card Number:</label>
+            <input
+              type="number"
+              id="cc"
+              name="cc"
+              placeholder="4242424242424242"
+              className="form-control"
+              value={cc}
+              // required
+              onChange={handleOnChange}
+            />
+          </div>
+          <p style={{ color: "red" }}>{formErrors?.cc}</p>
+          <br />
+          <div className="form-control">
+            <label for="cvv">Credit Card Code:</label>
+            <input
+              type="number"
+              id="cvv"
+              name="cvv"
+              placeholder="CVV"
+              className="form-control"
+              value={cvv}
+              onChange={handleOnChange}
+            />
+          </div>
+          <p style={{ color: "red" }}>{formErrors?.cvv}</p>
+          <br />
+          <div className="form-control">
+            <label for="expire">Expiration Date (mmyy):</label>
+            <input
+              type="number"
+              id="expire"
+              name="expire"
+              placeholder="mmyy"
+              className="form-control"
+              value={expire}
+              onChange={handleOnChange}
+            />
+          </div>
+          <p style={{ color: "red" }}>{formErrors?.expire}</p>
+          <br />
+          {/* <PaymentElement /> */}
         </div>
         <button
-          disabled={!stripe}
-          className="btn"
+          // disabled={!isEnabled}
+          className="form-control"
           style={{ marginTop: "40px" }}
           id="stripe-payment-button"
         >
           Submit
         </button>
+        <ToastContainer position="bottom-right" newestOnTop />
       </ContentBox>
     </form>
   );
@@ -124,8 +344,7 @@ const SubscriptionInnerForm = ({ clientSecret }) => {
 
 export const SubscriptionForm = ({ planRef }) => {
   const stripePromise = loadStripe(
-    ""
-    //""
+    "pk_test_51MMQs0HXnCGRiN0ao6Gd3d4zahjjsaDJBGxXdULHcPgqZhN9oMbvu0Nf0Wuez0qdEcbsD4TjFIfZCPpIaLTuqI3n00eU6NHVeb"
   );
 
   const { clientSecret } = useContext(SubscriptionsContext);

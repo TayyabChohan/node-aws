@@ -15,8 +15,15 @@ const { nanoid } = require("nanoid");
 const { sendPasswordResetEmail } = require("../utils/send-email");
 const { createEmptySalesRecord } = require("../utils/sales-records");
 const { isAlreadyLoggedIn } = require("../utils/login-utils");
+const {
+  createCustomerProfile,
+} = require("../routes/authCreateCustomer-routes");
 //require rate-limiter-flexible to defend against brute force attacks to obtain passwords
 const { RateLimiterMemory } = require("rate-limiter-flexible");
+const { loginId, transactionKey } = require(".././auth-config");
+const ApiContracts = require("authorizenet").APIContracts;
+const ApiControllers = require("authorizenet").APIControllers;
+var utils = require("../utils/auth-utils.js");
 
 const opts_fast_brute = {
   points: 5, // 6 points
@@ -32,189 +39,324 @@ const limiterFastBruteByIP = new RateLimiterMemory(opts_fast_brute);
 const limiterSlowBruteByIP = new RateLimiterMemory(opts_slow_brute);
 
 module.exports = function (app, stripe) {
+  // console.log(stripe, "stripe");
   //register
   app.post("/register", isAlreadyLoggedIn, async (req, res) => {
     if (!req.body.email || !req.body.password) {
       res.json({ success: false, msg: "Please pass username and password." });
     } else {
-      try {
-        //create a new customer
-        const customer = await stripe.customers.create({
-          email: req.body.email,
-        });
-        //get the user's country abbreviation
-        const countryAbbr = iso.whereCountry(req.body.country).alpha2;
-        //create a connected account. for now, this will be used only for account execs
-        //to receive payments from subscription fees, but in the next release, it will be used in the shop
-        const account = await stripe.accounts.create({
-          type: "express",
-          country: countryAbbr,
-          email: req.body.email,
-          capabilities: {
-            card_payments: {
-              requested: true,
-            },
-            transfers: {
-              requested: true,
-            },
-          },
-          business_type: "individual",
-          business_profile: {
-            url: "https://creativeu.live",
-          },
-        });
-        //verify their account executive code if present
-        const { accountExecCode, promoCode } = req.body;
-        let isAccountExec = false;
-        if (accountExecCode) {
-          try {
-            const code = await JoinCode.find({
-              code: accountExecCode,
-              category: 0,
-            });
-            if (code) {
-              isAccountExec = true;
-            } else {
-              console.log("Could not find account exec join code");
-              return res
-                .status(404)
-                .send("Could not find account exec join code.");
+      const { accountExecCode, promoCode } = req.body;
+      let isAccountExec = false;
+      if (accountExecCode) {
+        try {
+          const code = await JoinCode.find({
+            code: accountExecCode,
+            category: 0,
+          });
+          if (code) {
+            isAccountExec = true;
+          } else {
+            console.log("Could not find account exec join code");
+            return res
+              .status(404)
+              .send("Could not find account exec join code.");
+          }
+        } catch (e) {
+          res.status(500).send("Error finding join code");
+        }
+      }
+      let hasValidPromoCode = false;
+      if (promoCode) {
+        try {
+          const pcode = await JoinCode.find({ code: promoCode, category: 1 });
+          if (pcode) {
+            hasValidPromoCode = true;
+          } else {
+            console.log("Could not find promocode");
+            return res.status(404).send("Could not find account promocode.");
+          }
+        } catch (e) {
+          console.log("Error finding join code");
+          console.log(e);
+          res.status(500).send("Error finding join code");
+        }
+      }
+      //save the user
+      const newUser = new User({
+        type: req.body.type,
+        category: req.body.category,
+        isDiscoverable: true,
+        email: req.body.email,
+        password: req.body.password,
+        fname: req.body.fname,
+        lname: req.body.lname,
+        displayName: req.body.displayName,
+        tags: req.body.tags ? req.body.tags : [],
+        streetAddressLine1: req.body.streetAddressLine1,
+        streetAddressLine2: req.body.streetAddressLine2
+          ? req.body.streetAddressLine2
+          : "",
+        city: req.body.city,
+        stateOrProvince: req.body.stateOrProvince,
+        country: req.body.country,
+        postalCode: req.body.postalCode,
+        cell: req.body.cell ? req.body.cell : "",
+        lat: req.body.lat,
+        lng: req.body.lng,
+        // stripeCustomerID: customer.id,
+        stripeCustomerID: "cus_N9NeY3Ge9OqQ8m",
+        secret: "customer.clientSecret",
+        stripeAccountID: 32,
+        isAccountExec: true,
+        //never (for testing)
+        // expirationDate: isAccountExec || hasValidPromoCode ? "never" : "",
+      });
+      if (req.body.referrerJoinCode) {
+        newUser.referrerJoinCode = req.body.referrerJoinCode;
+      }
+      // save the user
+      newUser.save(function (err, user) {
+        if (err) {
+          return res.json({
+            success: false,
+            msg: "Username already exists.",
+          });
+        }
+        if (!user) {
+          return res.json({
+            success: false,
+            msg: "Could not create user.",
+          });
+        }
+        //if the user is an account executive, or used a promo code delete their code and then resave codes
+        if (isAccountExec) {
+          JoinCode.findOneAndDelete(
+            { code: accountExecCode },
+            function (err, docs) {
+              if (err) console.log("Error deleting account exec code.");
+              console.log(err);
+              if (!docs)
+                console.log(
+                  "No docs found to delete matching account Exec Code " +
+                    accountExecCode
+                );
+              if (docs) console.log("Deleted join code");
             }
-          } catch (e) {
-            console.log("Error finding join code");
-            console.log(e);
-            res.status(500).send("Error finding join code");
-          }
-        }
-        let hasValidPromoCode = false;
-        if (promoCode) {
-          try {
-            const pcode = await JoinCode.find({ code: promoCode, category: 1 });
-            if (pcode) {
-              hasValidPromoCode = true;
-            } else {
-              console.log("Could not find promocode");
-              return res.status(404).send("Could not find account promocode.");
-            }
-          } catch (e) {
-            console.log("Error finding join code");
-            console.log(e);
-            res.status(500).send("Error finding join code");
-          }
-        }
-        //save the user
-        const newUser = new User({
-          type: req.body.type,
-          category: req.body.category,
-          isDiscoverable: req.body.isDiscoverable,
-          email: req.body.email,
-          password: req.body.password,
-          fname: req.body.fname,
-          lname: req.body.lname,
-          displayName: req.body.displayName,
-          tags: req.body.tags ? req.body.tags : [],
-          streetAddressLine1: req.body.streetAddressLine1,
-          streetAddressLine2: req.body.streetAddressLine2
-            ? req.body.streetAddressLine2
-            : "",
-          city: req.body.city,
-          stateOrProvince: req.body.stateOrProvince,
-          country: req.body.country,
-          postalCode: req.body.postalCode,
-          cell: req.body.cell ? req.body.cell : "",
-          lat: req.body.lat,
-          lng: req.body.lng,
-          stripeCustomerID: customer.id,
-          secret: customer.clientSecret,
-          stripeAccountID: account.id,
-          isAccountExec,
-          //never (for testing)
-          expirationDate: isAccountExec || hasValidPromoCode ? "never" : "",
-        });
-        if (req.body.referrerJoinCode) {
-          newUser.referrerJoinCode = req.body.referrerJoinCode;
-        }
-        // save the user
-        newUser.save(function (err, user) {
-          if (err) {
-            return res.json({
-              success: false,
-              msg: "Username already exists.",
-            });
-          }
-          if (!user) {
-            return res.json({
-              success: false,
-              msg: "Could not create user.",
-            });
-          }
-          //if the user is an account executive, or used a promo code delete their code and then resave codes
-          if (isAccountExec) {
-            JoinCode.findOneAndDelete(
-              { code: accountExecCode },
-              function (err, docs) {
-                if (err) console.log("Error deleting account exec code.");
-                console.log(err);
-                if (!docs)
-                  console.log(
-                    "No docs found to delete matching account Exec Code " +
-                      accountExecCode
-                  );
-                if (docs) console.log("Deleted join code");
-              }
-            );
-          }
-          if (hasValidPromoCode) {
-            JoinCode.findOneAndDelete(
-              { code: promoCode },
-              function (err, docs) {
-                if (err) console.log("Error deleting promo code.");
-                console.log(err);
-                if (!docs)
-                  console.log(
-                    "No docs found to delete matching promoCode " +
-                      accountExecCode
-                  );
-                if (docs) console.log("Deleted join code");
-              }
-            );
-          }
-          //tokenize the user's secretID, email and role
-          const claims = {
-            secretID: user.secretID,
-            email: user.email,
-            permissions: "user",
-          };
-          const token = jwt.sign(
-            claims,
-            settings.secret,
-            { expiresIn: 60 * 60 * 24 * 14 } //60 seconds * 60 minutes * 24 hours * 14 days
           );
-          // log the user in. set a cookie in the user's browser and then return the user information.
-          res.cookie("jwt", token, {
-            httpOnly: true,
-            domain: "creativeu.live",
-            sameSite: true,
-            signed: true,
-            secure: true, //change to true for production
-            expires: new Date(DateTime.now().plus({ days: 14 }).toISO()),
+        }
+        if (hasValidPromoCode) {
+          JoinCode.findOneAndDelete({ code: promoCode }, function (err, docs) {
+            if (err) console.log("Error deleting promo code.");
+            console.log(err);
+            if (!docs)
+              console.log(
+                "No docs found to delete matching promoCode " + accountExecCode
+              );
+            if (docs) console.log("Deleted join code");
           });
-          //notifications, messageThreads, and event requests default to empty arrays
-          res.json({
-            success: true,
-            user: {
-              ...user._doc,
-              notifications: [],
-              messageThreads: [],
-              eventRequests: [],
-              accountActive: isActive(user),
-            },
-          });
+        }
+        // tokenize the user's secretID, email and role
+        const claims = {
+          // secretID: user.secretID,
+          secretID: "3213sdfsfsdfqweq",
+          // email: user.email,
+          email: "tayyab@gmail.com",
+          permissions: "user",
+        };
+        // const token = jwt.sign(
+        //   claims,
+        //   'asdasfasfsafas',
+        //    settings.secret,
+        //   { expiresIn: 60 * 60 * 24 * 14 } //60 seconds * 60 minutes * 24 hours * 14 days
+        // );
+        // console.log(token,'token')
+        // // log the user in. set a cookie in the user's browser and then return the user information.
+        // res.cookie("jwt", 'fjsf234jhjknaswwr23423898dhjhqg4h', {
+        //   httpOnly: true,
+        //   domain: "creativeu.live",
+        //   sameSite: true,
+        //   signed: true,
+        //   secure: true, //change to true for production
+        //   expires: new Date(DateTime.now().plus({ days: 14 }).toISO()),
+        // });
+        //notifications, messageThreads, and event requests default to empty arrays
+        res.json({
+          success: true,
+          user: {
+            ...user,
+            notifications: [],
+            messageThreads: [],
+            eventRequests: [],
+            accountActive: isActive(user),
+            // accountActive: user,
+          },
         });
+      });
+      // } catch (e) {
+      //   res.sendStatus(500);
+      // }
+    }
+  });
+  app.post("/register_update", isAlreadyLoggedIn, async (req, res) => {
+    console.log(req.body, "req");
+   const isEmail= User.findOne(
+      {
+        _id: req.body._id,
+      })
+      // console.log(isEmail,'ccccc')
+      if(isEmail){
+        console.log('tayayayayaa')
+      }
+    const { accountExecCode, promoCode } = req.body;
+    // console.log(req.body, "req.body");
+    // console.log(accountExecCode, promoCode, "req.body");
+    let isAccountExec = false;
+    if (accountExecCode) {
+      try {
+        const code = await JoinCode.find({
+          code: accountExecCode,
+          category: 0,
+        });
+        if (code) {
+          isAccountExec = true;
+        } else {
+          console.log("Could not find account exec join code");
+          return res.status(404).send("Could not find account exec join code.");
+        }
       } catch (e) {
-        res.sendStatus(500);
+        res.status(500).send("Error finding join code");
       }
     }
+    let hasValidPromoCode = false;
+    if (promoCode) {
+      try {
+        const pcode = await JoinCode.find({ code: promoCode, category: 1 });
+        if (pcode) {
+          hasValidPromoCode = true;
+        } else {
+          console.log("Could not find promocode");
+          return res.status(404).send("Could not find account promocode.");
+        }
+      } catch (e) {
+        console.log("Error finding join code");
+        console.log(e);
+        res.status(500).send("Error finding join code");
+      }
+    }
+    //save the user
+    const newUser = new User({
+      type: req.body.type,
+      category: req.body.category,
+      isDiscoverable: true,
+      email: req.body.email,
+      password: req.body.password,
+      fname: req.body.fname,
+      lname: req.body.lname,
+      displayName: req.body.displayName,
+      tags: req.body.tags ? req.body.tags : [],
+      streetAddressLine1: req.body.streetAddressLine1,
+      streetAddressLine2: req.body.streetAddressLine2
+        ? req.body.streetAddressLine2
+        : "",
+      city: req.body.city,
+      stateOrProvince: req.body.stateOrProvince,
+      country: req.body.country,
+      postalCode: req.body.postalCode,
+      cell: req.body.cell ? req.body.cell : "",
+      lat: req.body.lat,
+      lng: req.body.lng,
+      // stripeCustomerID: customer.id,
+      stripeCustomerID: 234,
+      secret: "customer.clientSecret",
+      stripeAccountID: 32,
+      isAccountExec: true,
+      //never (for testing)
+      // expirationDate: isAccountExec || hasValidPromoCode ? "never" : "",
+    });
+    if (req.body.referrerJoinCode) {
+      newUser.referrerJoinCode = req.body.referrerJoinCode;
+    }
+    // save the user
+    newUser.save(function (err, user) {
+      if (err) {
+        return res.json({
+          success: false,
+          msg: "Username already exists.",
+        });
+      }
+      if (!user) {
+        return res.json({
+          success: false,
+          msg: "Could not create user.",
+        });
+      }
+      //if the user is an account executive, or used a promo code delete their code and then resave codes
+      if (isAccountExec) {
+        JoinCode.findOneAndDelete(
+          { code: accountExecCode },
+          function (err, docs) {
+            if (err) console.log("Error deleting account exec code.");
+            console.log(err);
+            if (!docs)
+              console.log(
+                "No docs found to delete matching account Exec Code " +
+                  accountExecCode
+              );
+            if (docs) console.log("Deleted join code");
+          }
+        );
+      }
+      if (hasValidPromoCode) {
+        JoinCode.findOneAndDelete({ code: promoCode }, function (err, docs) {
+          if (err) console.log("Error deleting promo code.");
+          console.log(err);
+          if (!docs)
+            console.log(
+              "No docs found to delete matching promoCode " + accountExecCode
+            );
+          if (docs) console.log("Deleted join code");
+        });
+      }
+      // tokenize the user's secretID, email and role
+      const claims = {
+        // secretID: user.secretID,
+        secretID: "3213sdfsfsdfqweq",
+        // email: user.email,
+        email: "tayyab@gmail.com",
+        permissions: "user",
+      };
+      // const token = jwt.sign(
+      //   claims,
+      //   'asdasfasfsafas',
+      //    settings.secret,
+      //   { expiresIn: 60 * 60 * 24 * 14 } //60 seconds * 60 minutes * 24 hours * 14 days
+      // );
+      // console.log(token,'token')
+      // // log the user in. set a cookie in the user's browser and then return the user information.
+      // res.cookie("jwt", 'fjsf234jhjknaswwr23423898dhjhqg4h', {
+      //   httpOnly: true,
+      //   domain: "creativeu.live",
+      //   sameSite: true,
+      //   signed: true,
+      //   secure: true, //change to true for production
+      //   expires: new Date(DateTime.now().plus({ days: 14 }).toISO()),
+      // });
+      //notifications, messageThreads, and event requests default to empty arrays
+      res.json({
+        success: true,
+        user: {
+          ...user,
+          notifications: [],
+          messageThreads: [],
+          eventRequests: [],
+          accountActive: isActive(user),
+          // accountActive: user,
+        },
+      });
+    });
+    // } catch (e) {
+    //   res.sendStatus(500);
+    // }
   });
 
   //login
@@ -306,27 +448,27 @@ module.exports = function (app, stripe) {
                           stripe
                         );
                         //tokenize the user's secretID, email and role
-                        const claims = {
-                          secretID: user.secretID,
-                          email: user.email,
-                          permissions: "user",
-                        };
-                        const token = jwt.sign(
-                          claims,
-                          settings.secret,
-                          { expiresIn: 60 * 60 * 24 * 14 } //60 seconds * 60 minutes * 24 hours * 14 days
-                        );
-                        // set a cookie in the user's browser and then return the user
-                        res.cookie("jwt", token, {
-                          httpOnly: true,
-                          domain: "creativeu.live",
-                          sameSite: true,
-                          signed: true,
-                          secure: true, //SET TO TRUE FOR PRODUCTION
-                          expires: new Date(
-                            DateTime.now().plus({ days: 14 }).toISO()
-                          ),
-                        });
+                        // const claims = {
+                        //   secretID: user.secretID,
+                        //   email: user.email,
+                        //   permissions: "user",
+                        // };
+                        // const token = jwt.sign(
+                        //   claims,
+                        //   settings.secret,
+                        //   { expiresIn: 60 * 60 * 24 * 14 } //60 seconds * 60 minutes * 24 hours * 14 days
+                        // );
+                        // // set a cookie in the user's browser and then return the user
+                        // res.cookie("jwt", token, {
+                        //   httpOnly: true,
+                        //   domain: "creativeu.live",
+                        //   sameSite: true,
+                        //   signed: true,
+                        //   secure: true, //SET TO TRUE FOR PRODUCTION
+                        //   expires: new Date(
+                        //     DateTime.now().plus({ days: 14 }).toISO()
+                        //   ),
+                        // });
                         res.json({
                           success: true,
                           user: userObjToSend,
@@ -349,9 +491,10 @@ module.exports = function (app, stripe) {
   //find the current user
   app.get(
     "/authenticated_user",
-    isAlreadyLoggedIn,
+    // isAlreadyLoggedIn,
     passport.authenticate("user", { session: false }),
     async (req, res) => {
+      console.log(req);
       if (req.user) {
         const { user } = req;
         const userObjToSend = await constructUserObjToSend(user, stripe);

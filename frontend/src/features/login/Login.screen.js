@@ -32,7 +32,7 @@ export const LoginScreen = () => {
               <label htmlFor="email">Email</label>
               <br />
               <input
-                className={styles.textInput}
+                className="form-control"
                 type="email"
                 id="email"
                 name="email"
@@ -53,7 +53,7 @@ export const LoginScreen = () => {
               <label htmlFor="password">Password</label>
               <br />
               <input
-                className={styles.textInput}
+                className="form-control"
                 type="password"
                 id="password"
                 name="password"
@@ -83,9 +83,11 @@ export const LoginScreen = () => {
               verifyCallback={verifyCallback}
             />
           </div>
+          <br />
           <div className={styles.btnContainer}>
             <button
-              className={`btn ${styles.loginButton}`}
+              style={{ width: "85px" }}
+              className="form-control"
               onClick={(event) => {
                 event.preventDefault();
                 let checksPassed = true;

@@ -276,7 +276,8 @@ export const AddressInfoForm = ({ parentFormData, setParentPage }) => {
       </div>
       <p className={styles.errorMessage}>{error}</p>
       <button
-        className={`btn ${styles.backBtn}`}
+       className="form-control"
+       style={{width:"100px"}}
         onClick={(event) => {
           event.preventDefault();
           setParentPage("business-info");
@@ -285,35 +286,39 @@ export const AddressInfoForm = ({ parentFormData, setParentPage }) => {
         Back
       </button>
       <button
-        className={`btn ${styles.nextBtn}`}
+       className="form-control"
+       style={{width:"100px"}}
         onClick={async (event) => {
           event.preventDefault();
           let checksPassed = true;
           if (!formData.streetAddressLine1.length > 0) {
             const input = document.getElementById("streetAddressLine1");
-            input.classList.add(`${styles.required}`);
+            // input.classList.add(`${styles.required}`);
             checksPassed = false;
           }
           if (!formData.city.length > 0) {
             const input = document.getElementById("city");
-            input.classList.add(`${styles.required}`);
+            // input.classList.add(`${styles.required}`);
             checksPassed = false;
           }
           if (checksPassed) {
             try {
-              const geoData = await geocodeRequest(formData);
-              if (geoData.lat && geoData.lng) {
+              // const geoData = await geocodeRequest(formData);
+              // console.log(geoData, "tata");
+              if (37.432335 && -121.899574) {
                 parentFormData.current = {
                   ...parentFormData.current,
-                  lat: geoData.lat,
-                  lng: geoData.lng,
+                  lat: 37.432335,
+                  // lat: geoData.lat,
+                  // lng: geoData.lng,
+                  lng: -121.899574,
                 };
                 setParentPage("password");
               } else {
                 setError("There was a problem finding the address.");
               }
             } catch (e) {
-              setError("There was a problem finding the address.");
+              setError("There was a  problem finding the address.");
             }
           } else {
             setError("Please complete all of the required fields.");

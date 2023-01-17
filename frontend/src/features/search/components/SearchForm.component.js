@@ -125,30 +125,30 @@ export const SearchForm = ({ useSearchScreenStyles }) => {
     }
   };
 
-  useEffect(() => {
-    const options = {
-      fields: ["formatted_address", "geometry", "name"],
-      strictBounds: false,
-      types: ["(cities)"],
-    };
-    const autocomplete = new window.google.maps.places.Autocomplete(
-      autocompleteRef.current,
-      options
-    );
-    autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
+  // useEffect(() => {
+  //   const options = {
+  //     fields: ["formatted_address", "geometry", "name"],
+  //     strictBounds: false,
+  //     types: ["(cities)"],
+  //   };
+  //   const autocomplete = new window.google.maps.places.Autocomplete(
+  //     autocompleteRef.current,
+  //     options
+  //   );
+  //   autocomplete.addListener("place_changed", () => {
+  //     const place = autocomplete.getPlace();
 
-      if (!place.geometry || !place.geometry.location) {
-        // User entered the name of a Place that was not suggested and
-        // pressed the Enter key, or the Place Details request failed.
-        window.alert("No details available for input: '" + place.name + "'");
-        return;
-      }
+  //     if (!place.geometry || !place.geometry.location) {
+  //       // User entered the name of a Place that was not suggested and
+  //       // pressed the Enter key, or the Place Details request failed.
+  //       window.alert("No details available for input: '" + place.name + "'");
+  //       return;
+  //     }
 
-      geocodedLat.current = place.geometry.location.lat();
-      geocodedLng.current = place.geometry.location.lng();
-    });
-  }, []);
+  //     geocodedLat.current = place.geometry.location.lat();
+  //     geocodedLng.current = place.geometry.location.lng();
+  //   });
+  // }, []);
 
   return (
     <div className={styles.searchOuterContainer}>

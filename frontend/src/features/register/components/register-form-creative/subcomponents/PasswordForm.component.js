@@ -120,7 +120,8 @@ export const PasswordForm = ({ parentFormData, setParentPage }) => {
       </div>
       <p className={styles.errorMessage}>{error}</p>
       <button
-        className={`btn ${styles.backBtn}`}
+        className="form-control"
+        style={{ width: "100px" }}
         disabled={registering}
         onClick={(event) => {
           event.preventDefault();
@@ -131,7 +132,8 @@ export const PasswordForm = ({ parentFormData, setParentPage }) => {
       </button>
       <button
         disabled={registering}
-        className={`btn ${styles.nextBtn}`}
+        className="form-control"
+        style={{ width: "100px" }}
         onClick={(event) => {
           event.preventDefault();
           if (validatePassword(password, repeatedPassword, setError)) {

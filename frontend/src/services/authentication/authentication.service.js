@@ -14,6 +14,7 @@ export const registerRequest = (userObj) => {
   });
 };
 
+
 export const loginRequest = (email, password) => {
   return new Promise((resolve, reject) => {
     axios
@@ -57,6 +58,7 @@ export const checkForMod = () => {
 };
 
 export const emailInUse = (email) => {
+  console.log(email,'email')
   return new Promise(async (resolve, reject) => {
     try {
       const res = await axios.post(`/validate_email`, {

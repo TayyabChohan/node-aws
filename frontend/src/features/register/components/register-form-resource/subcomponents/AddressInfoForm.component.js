@@ -276,7 +276,8 @@ export const AddressInfoForm = ({ parentFormData, setParentPage }) => {
       </div>
       <p className={styles.errorMessage}>{error}</p>
       <button
-        className={`btn ${styles.backBtn}`}
+        className="form-control"
+        style={{width:"100px"}}
         onClick={(event) => {
           event.preventDefault();
           setParentPage("resource-info");
@@ -285,7 +286,8 @@ export const AddressInfoForm = ({ parentFormData, setParentPage }) => {
         Back
       </button>
       <button
-        className={`btn ${styles.nextBtn}`}
+        className="form-control"
+        style={{width:"100px"}}
         onClick={async (event) => {
           event.preventDefault();
           let checksPassed = true;

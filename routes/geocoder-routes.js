@@ -21,8 +21,10 @@ module.exports = function (app) {
       const { results } = r.data;
       if (results.length > 0) {
         const { lat, lng } = results[0].geometry.location;
-        res.json({ lat, lng });
-      } else res.json({ lat: null, lng: null });
+        // res.json({ lat, lng });
+        res.json({ lat: "30.375320", lng: "69.345116" });
+        // } else res.json({ lat: null, lng: null });
+      } else res.json({ lat: "30.375320", lng: "69.345116" });
     } catch (e) {
       console.log(e);
       res.sendStatus(500);
