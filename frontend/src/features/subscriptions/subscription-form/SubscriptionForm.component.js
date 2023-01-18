@@ -7,8 +7,9 @@ import { ContentBox } from "../../../components/content-box/ContentBox.component
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Redirect, useHistory } from "react-router-dom";
-
+import { useHistory } from "react-router-dom";
+const blockInvalidChar = (e) =>
+  ["e", "E", "+", "-"].includes(e.key) && e.preventDefault();
 const SubscriptionInnerForm = ({ clientSecret }) => {
   const { user } = useContext(AuthenticationContext);
   const { planType, setPlen } = useContext(SubscriptionsContext);
@@ -27,7 +28,7 @@ const SubscriptionInnerForm = ({ clientSecret }) => {
   } else {
     pricePlan = "1629.38";
   }
-  
+
   let history = useHistory();
   const registerRequestUpdate = (userObj) => {
     return new Promise(async (resolve, reject) => {
@@ -133,9 +134,9 @@ const SubscriptionInnerForm = ({ clientSecret }) => {
           stripeCustomerID: user.stripeCustomerID,
         });
         resolve(setResultSubscription(res.data));
-        console.log(res.data)
+        console.log(res.data);
       } catch (e) {
-        console.log(e)
+        console.log(e);
         reject(setResultSubscription(e));
       }
     });
@@ -295,8 +296,10 @@ const SubscriptionInnerForm = ({ clientSecret }) => {
               id="cc"
               name="cc"
               placeholder="4242424242424242"
-              className="form-control"
+              className="form-control w-100"
               value={cc}
+              onKeyDown={blockInvalidChar}
+              maxLength={16}
               // required
               onChange={handleOnChange}
             />
@@ -311,7 +314,9 @@ const SubscriptionInnerForm = ({ clientSecret }) => {
               name="cvv"
               placeholder="CVV"
               className="form-control"
+              onKeyDown={blockInvalidChar}
               value={cvv}
+              maxLength={3}
               onChange={handleOnChange}
             />
           </div>
@@ -326,6 +331,8 @@ const SubscriptionInnerForm = ({ clientSecret }) => {
               placeholder="mmyy"
               className="form-control"
               value={expire}
+              maxLength={4}
+              onKeyDown={blockInvalidChar}
               onChange={handleOnChange}
             />
           </div>
