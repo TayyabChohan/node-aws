@@ -116,33 +116,35 @@ export const PasswordForm = ({ parentFormData, setParentPage }) => {
         />
       </div>
       <p className={styles.errorMessage}>{error}</p>
-      <button
-        className="form-control"
-        style={{ width: "100px" }}
-        onClick={(event) => {
-          event.preventDefault();
-          setParentPage("address-info");
-        }}
-      >
-        Back
-      </button>
-      <button
-        className="form-control"
-        style={{ width: "100px" }}
-        onClick={(event) => {
-          event.preventDefault();
-          if (validatePassword(password, repeatedPassword, setError)) {
-            if (!recaptchaPassed) {
-              setError("Please complete the recaptcha");
-              return;
-            } else {
-              onRegister(parentFormData.current);
+      <div style={{ display: "flex" }}>
+        <button
+          className="form-control"
+          style={{ width: "100px" }}
+          onClick={(event) => {
+            event.preventDefault();
+            setParentPage("address-info");
+          }}
+        >
+          Back
+        </button>
+        <button
+          className="form-control"
+          style={{ width: "100px" }}
+          onClick={(event) => {
+            event.preventDefault();
+            if (validatePassword(password, repeatedPassword, setError)) {
+              if (!recaptchaPassed) {
+                setError("Please complete the recaptcha");
+                return;
+              } else {
+                onRegister(parentFormData.current);
+              }
             }
-          }
-        }}
-      >
-        Register
-      </button>
+          }}
+        >
+          Register
+        </button>
+      </div>
     </div>
   );
 };

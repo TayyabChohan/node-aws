@@ -118,6 +118,7 @@ export const PasswordForm = ({ parentFormData, setParentPage }) => {
       </div>
       <p className={styles.errorMessage}>{error}</p>
       <p>
+      <div style={{ display: "flex" }}>
         <button
           className="form-control"
           style={{ width: "100px" }}
@@ -145,6 +146,7 @@ export const PasswordForm = ({ parentFormData, setParentPage }) => {
         >
           Register
         </button>
+        </div>
       </p>
     </div>
   );

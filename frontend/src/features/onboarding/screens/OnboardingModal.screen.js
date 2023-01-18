@@ -38,11 +38,11 @@ export const OnboardingModalScreen = () => {
         .catch((e) => {
           setError(e.message);
         });
-    } else if (
-      user.isAccountExec &&
-      user.accountVerified &&
-      !user.hasViewedOnboardingMessage
-    ) {
+    // } else if (
+    //   user.isAccountExec &&
+    //   user.accountVerified &&
+    //   !user.hasViewedOnboardingMessage
+    // ) {
       setIsLoading(false);
     } else {
       //otherwise, if the user's account is verified and they've already seen the onboarding message, don't show anything

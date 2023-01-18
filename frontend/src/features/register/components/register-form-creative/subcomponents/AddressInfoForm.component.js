@@ -252,53 +252,57 @@ export const AddressInfoForm = ({ parentFormData, setParentPage }) => {
         </div>
       </div>
       <p className={styles.errorMessage}>{error}</p>
-      <button
-        className={`btn ${styles.backBtn}`}
-        onClick={(event) => {
-          event.preventDefault();
-          setParentPage("artist-info");
-        }}
-      >
-        Back
-      </button>
-      <button
-        className={`btn ${styles.nextBtn}`}
-        onClick={async (event) => {
-          event.preventDefault();
-          let checksPassed = true;
-          if (!formData.streetAddressLine1.length > 0) {
-            const input = document.getElementById("streetAddressLine1");
-            input.classList.add(`${styles.required}`);
-            checksPassed = false;
-          }
-          if (!formData.city.length > 0) {
-            const input = document.getElementById("city");
-            input.classList.add(`${styles.required}`);
-            checksPassed = false;
-          }
-          if (checksPassed) {
-            try {
-              const geoData = await geocodeRequest(formData);
-              if (geoData.lat && geoData.lng) {
-                parentFormData.current = {
-                  ...parentFormData.current,
-                  lat: geoData.lat,
-                  lng: geoData.lng,
-                };
-                setParentPage("password");
-              } else {
+      <div style={{ display: "flex" }}>
+        <button
+          className="form-control"
+          style={{ width: "100px" }}
+          onClick={(event) => {
+            event.preventDefault();
+            setParentPage("artist-info");
+          }}
+        >
+          Back
+        </button>
+        <button
+          className="form-control"
+          style={{ width: "100px" }}
+          onClick={async (event) => {
+            event.preventDefault();
+            let checksPassed = true;
+            if (!formData.streetAddressLine1.length > 0) {
+              const input = document.getElementById("streetAddressLine1");
+              input.classList.add(`${styles.required}`);
+              checksPassed = false;
+            }
+            if (!formData.city.length > 0) {
+              const input = document.getElementById("city");
+              input.classList.add(`${styles.required}`);
+              checksPassed = false;
+            }
+            if (checksPassed) {
+              try {
+                const geoData = await geocodeRequest(formData);
+                if (geoData.lat && geoData.lng) {
+                  parentFormData.current = {
+                    ...parentFormData.current,
+                    lat: geoData.lat,
+                    lng: geoData.lng,
+                  };
+                  setParentPage("password");
+                } else {
+                  setError("There was a problem finding the address.");
+                }
+              } catch (e) {
                 setError("There was a problem finding the address.");
               }
-            } catch (e) {
-              setError("There was a problem finding the address.");
+            } else {
+              setError("Please complete all of the required fields.");
             }
-          } else {
-            setError("Please complete all of the required fields.");
-          }
-        }}
-      >
-        Next
-      </button>
+          }}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

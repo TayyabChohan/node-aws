@@ -1,9 +1,11 @@
 import axios from "axios";
 
+const basicURL = process.env.REACT_APP_BACKEND_URL;
+console.log(basicURL, "basicURL");
 export const registerRequest = (userObj) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const res = await axios.post("/register", {
+      const res = await axios.post(`/register`, {
         ...userObj,
       });
       const { user } = res.data;
@@ -14,11 +16,10 @@ export const registerRequest = (userObj) => {
   });
 };
 
-
 export const loginRequest = (email, password) => {
   return new Promise((resolve, reject) => {
     axios
-      .post("/login", { email, password })
+      .post(`/login`, { email, password })
       .then((res) => {
         const { user } = res.data;
         resolve(user);
@@ -58,7 +59,7 @@ export const checkForMod = () => {
 };
 
 export const emailInUse = (email) => {
-  console.log(email,'email')
+  console.log(email, "email");
   return new Promise(async (resolve, reject) => {
     try {
       const res = await axios.post(`/validate_email`, {

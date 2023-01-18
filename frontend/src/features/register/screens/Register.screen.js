@@ -87,6 +87,7 @@ export const RegisterScreen = () => {
                       </select>
                     </label>
                     <br/>
+                    <div></div>
                     <button
                       style={{ width: "120px" }}
                       className="form-control"

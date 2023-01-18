@@ -27,6 +27,7 @@ const SubscriptionInnerForm = ({ clientSecret }) => {
   } else {
     pricePlan = "1629.38";
   }
+  
   let history = useHistory();
   const registerRequestUpdate = (userObj) => {
     return new Promise(async (resolve, reject) => {
@@ -132,7 +133,9 @@ const SubscriptionInnerForm = ({ clientSecret }) => {
           stripeCustomerID: user.stripeCustomerID,
         });
         resolve(setResultSubscription(res.data));
+        console.log(res.data)
       } catch (e) {
+        console.log(e)
         reject(setResultSubscription(e));
       }
     });

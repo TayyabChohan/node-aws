@@ -275,58 +275,62 @@ export const AddressInfoForm = ({ parentFormData, setParentPage }) => {
         </div>
       </div>
       <p className={styles.errorMessage}>{error}</p>
-      <button
-       className="form-control"
-       style={{width:"100px"}}
-        onClick={(event) => {
-          event.preventDefault();
-          setParentPage("business-info");
-        }}
-      >
-        Back
-      </button>
-      <button
-       className="form-control"
-       style={{width:"100px"}}
-        onClick={async (event) => {
-          event.preventDefault();
-          let checksPassed = true;
-          if (!formData.streetAddressLine1.length > 0) {
-            const input = document.getElementById("streetAddressLine1");
-            // input.classList.add(`${styles.required}`);
-            checksPassed = false;
-          }
-          if (!formData.city.length > 0) {
-            const input = document.getElementById("city");
-            // input.classList.add(`${styles.required}`);
-            checksPassed = false;
-          }
-          if (checksPassed) {
-            try {
-              // const geoData = await geocodeRequest(formData);
-              // console.log(geoData, "tata");
-              if (37.432335 && -121.899574) {
-                parentFormData.current = {
-                  ...parentFormData.current,
-                  lat: 37.432335,
-                  // lat: geoData.lat,
-                  // lng: geoData.lng,
-                  lng: -121.899574,
-                };
-                setParentPage("password");
-              } else {
-                setError("There was a problem finding the address.");
-              }
-            } catch (e) {
-              setError("There was a  problem finding the address.");
+      <div style={{ display: "flex" }}>
+        <div  style={{display:"flex"}}>
+        <button
+          className="form-control"
+          style={{ width: "100px" }}
+          onClick={(event) => {
+            event.preventDefault();
+            setParentPage("business-info");
+          }}
+        >
+          Back
+        </button>
+        <button
+          className="form-control"
+          style={{ width: "100px" }}
+          onClick={async (event) => {
+            event.preventDefault();
+            let checksPassed = true;
+            if (!formData.streetAddressLine1.length > 0) {
+              const input = document.getElementById("streetAddressLine1");
+              // input.classList.add(`${styles.required}`);
+              checksPassed = false;
             }
-          } else {
-            setError("Please complete all of the required fields.");
-          }
-        }}
-      >
-        Next
-      </button>
+            if (!formData.city.length > 0) {
+              const input = document.getElementById("city");
+              // input.classList.add(`${styles.required}`);
+              checksPassed = false;
+            }
+            if (checksPassed) {
+              try {
+                // const geoData = await geocodeRequest(formData);
+                // console.log(geoData, "tata");
+                if (37.432335 && -121.899574) {
+                  parentFormData.current = {
+                    ...parentFormData.current,
+                    lat: 37.432335,
+                    // lat: geoData.lat,
+                    // lng: geoData.lng,
+                    lng: -121.899574,
+                  };
+                  setParentPage("password");
+                } else {
+                  setError("There was a problem finding the address.");
+                }
+              } catch (e) {
+                setError("There was a  problem finding the address.");
+              }
+            } else {
+              setError("Please complete all of the required fields.");
+            }
+          }}
+        >
+          Next
+        </button>
+        </div>
+      </div>
     </div>
   );
 };

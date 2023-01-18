@@ -275,6 +275,7 @@ export const AddressInfoForm = ({ parentFormData, setParentPage }) => {
         </div>
       </div>
       <p className={styles.errorMessage}>{error}</p>
+    <div  style={{display:"flex"}}>
       <button
         className="form-control"
         style={{width:"100px"}}
@@ -324,6 +325,7 @@ export const AddressInfoForm = ({ parentFormData, setParentPage }) => {
       >
         Next
       </button>
+      </div>
     </div>
   );
 };
