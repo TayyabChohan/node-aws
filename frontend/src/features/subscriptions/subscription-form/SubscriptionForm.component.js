@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useHistory } from "react-router-dom";
 const blockInvalidChar = (e) =>
   ["e", "E", "+", "-"].includes(e.key) && e.preventDefault();
+  
 const SubscriptionInnerForm = ({ clientSecret }) => {
   const { user } = useContext(AuthenticationContext);
   const { planType, setPlen } = useContext(SubscriptionsContext);
