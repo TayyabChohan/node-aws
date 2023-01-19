@@ -110,7 +110,9 @@ require("./routes/authChargeCredit-routes")(app);
 // Send every other request to the React app
 // Define any API routes before this runs
 app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "./client/build/index.html"));
+  // res.sendFile(path.join(__dirname, "./client/build/index.html"));
+  res.sendFile(path.join(__dirname, "./frontend/build/index.html"));
+  res.sendFile(path.join(__dirname, "./frontend/build"));
 });
 // //connect to the db
 
@@ -119,11 +121,11 @@ app.get("/*", (req, res) => {
 //       ? "mongodb://localhost:27017/creativeu_db"
 //       : `mongodb+srv://WebifyDev:${process.env.ATLAS_PASSWORD}@creativeucluster.wvuoo.mongodb.net/CreativeU?retryWrites=true&w=majority`
 //   );
-const url = `mongodb+srv://creativeu_db:creativeu_db@cluster0.dtr7api.mongodb.net/?retryWrites=true&w=majority`;
+const url = ``;
 
 mongoose
   // .connect("mongodb://localhost:27017/test-db")
-  .connect(url)
+  .connect(process.env.ATLAS_PASSWORD)
   .then(() => console.log("Connected to mongodb"))
   .catch((error) => console.log(error));
 const port = process.env.PORT || 5001;
