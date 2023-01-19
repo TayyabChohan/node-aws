@@ -111,8 +111,8 @@ require("./routes/authChargeCredit-routes")(app);
 // Define any API routes before this runs
 app.get("/*", (req, res) => {
   // res.sendFile(path.join(__dirname, "./client/build/index.html"));
-  res.sendFile(path.join(__dirname, "./frontend/build/index.html"));
   res.sendFile(path.join(__dirname, "./frontend/build"));
+  res.sendFile(path.join(__dirname, "./frontend/build/index.html"));
 });
 // //connect to the db
 
