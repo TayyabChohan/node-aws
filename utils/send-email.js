@@ -2,8 +2,8 @@
 var AWS = require("aws-sdk");
 
 const SES_CONFIG = {
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID, //add AWS IAM user access key here
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, //add AWS IAM user secret key here
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID_01, //add AWS IAM user access key here
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_01, //add AWS IAM user secret key here
   region: "us-east-2",
 };
 
