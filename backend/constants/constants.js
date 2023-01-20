@@ -1,7 +1,10 @@
 const ALLOWED_ORIGINS = [
+  "35.89.144.243",
   "127.0.0.1",
   "creativeu.live",
   "creativeu-app.live",
+  "https://react-aws-1ih2.vercel.app/",
+  "react-aws-1ih2.vercel.app/",
   //"http://creativeu2-env.eba-h38mfdrw.us-east-2.elasticbeanstalk.com", //original environment
   "creativeuproduction-env.eba-jr4zejhn.us-east-2.elasticbeanstalk.com",
   "creativeucluster.wvuoo.mongodb.net",
