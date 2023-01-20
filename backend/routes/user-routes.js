@@ -491,7 +491,7 @@ module.exports = function (app, stripe) {
   //find the current user
   app.get(
     "/authenticated_user",
-    // isAlreadyLoggedIn,
+    isAlreadyLoggedIn,
     passport.authenticate("user", { session: false }),
     async (req, res) => {
       console.log(req);

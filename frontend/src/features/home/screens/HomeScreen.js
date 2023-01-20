@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Hero } from "../components/Hero";
 import { Footer } from "../../../components/footer/Footer.component";
-// import creativeU from "../../../assets/videos/CreativeU.mp4";
+import creativeU from "../../../assets/videos/CreativeU.mp4";
 import twoPeopleAtComputer from "../../../../src/assets/images/two-people-at-computer.jpg";
 import aGuyWithAGuitar from "../../../../src/assets/images/a-guy-with-guitar.jpg";
 import dancer from "../../../assets/images/dancer.jpg";
@@ -183,7 +183,7 @@ export const HomeScreen = () => {
             boxShadow: "2px 2px 4px black",
           }}
         >
-          {/* <source src={creativeU} type="video/mp4" /> */}
+          <source src={creativeU} type="video/mp4" />
           Sorry, your browser doesn't support embedded videos.
         </video>
       </section>

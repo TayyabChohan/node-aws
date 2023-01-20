@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/static/css/main.e61a987c.chunk.css",
-    "main.js": "/static/js/main.bb6e97c3.chunk.js",
-    "main.js.map": "/static/js/main.bb6e97c3.chunk.js.map",
+    "main.js": "/static/js/main.82fc36ef.chunk.js",
+    "main.js.map": "/static/js/main.82fc36ef.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.5537d182.js",
     "runtime-main.js.map": "/static/js/runtime-main.5537d182.js.map",
     "static/css/2.bfa772d0.chunk.css": "/static/css/2.bfa772d0.chunk.css",
@@ -14,6 +14,7 @@
     "static/css/2.bfa772d0.chunk.css.map": "/static/css/2.bfa772d0.chunk.css.map",
     "static/css/main.e61a987c.chunk.css.map": "/static/css/main.e61a987c.chunk.css.map",
     "static/js/2.95fb275c.chunk.js.LICENSE.txt": "/static/js/2.95fb275c.chunk.js.LICENSE.txt",
+    "static/media/CreativeU.58d0cf12.mp4": "/static/media/CreativeU.58d0cf12.mp4",
     "static/media/a-guy-with-guitar.74d4ba0b.jpg": "/static/media/a-guy-with-guitar.74d4ba0b.jpg",
     "static/media/artist.9c7d1251.jpg": "/static/media/artist.9c7d1251.jpg",
     "static/media/business.dac98151.jpg": "/static/media/business.dac98151.jpg",
@@ -32,6 +33,6 @@
     "static/css/2.bfa772d0.chunk.css",
     "static/js/2.95fb275c.chunk.js",
     "static/css/main.e61a987c.chunk.css",
-    "static/js/main.bb6e97c3.chunk.js"
+    "static/js/main.82fc36ef.chunk.js"
   ]
 }

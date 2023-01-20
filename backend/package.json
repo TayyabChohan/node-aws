@@ -7,6 +7,10 @@
     "start": "nodemon index.js",
     "vercel-build": "node ./build.js"
   },
+  "homepage": ".",
+  "engines": {
+    "node": "16.x"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
