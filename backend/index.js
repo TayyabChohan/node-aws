@@ -124,8 +124,8 @@ app.get("/*", (req, res) => {
 const url = ``;
 
 mongoose
-  // .connect("mongodb://localhost:27017/test-db")
-  .connect(process.env.ATLAS_PASSWORD)
+  .connect("mongodb://localhost:27017/test-db")
+  // .connect(process.env.ATLAS_PASSWORD)
   .then(() => console.log("Connected to mongodb"))
   .catch((error) => console.log(error));
 const port = process.env.PORT || 5001;
