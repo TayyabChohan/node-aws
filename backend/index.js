@@ -110,8 +110,7 @@ require("./routes/authChargeCredit-routes")(app);
 // Send every other request to the React app
 // Define any API routes before this runs
 app.get("/*", (req, res) => {
-  // res.sendFile(path.join(__dirname, "./client/build/index.html"));
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "./client/build/index.html"));
   // res.sendFile(path.join(__dirname, "../frontend/build"));
   // res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
 });

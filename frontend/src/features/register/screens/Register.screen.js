@@ -23,7 +23,6 @@ export const RegisterScreen = () => {
   const code = params.get("accountexec");
   const referrer = params.get("referrer");
   const promoCode = params.get("joincode");
-  console.log(promoCode, referrer, code, params, queryString, "tayyab");
   useEffect(() => {
     window.scrollTo(0, 0);
     if (!code) setIsLoading(false);

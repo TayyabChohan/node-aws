@@ -174,7 +174,7 @@ export const Navigation = () => {
           {isAuthenticatedMod ? <ModDashboardScreen /> : <ModLoginScreen />}
         </Route>
         <Route path="/">
-          {userType ? <HomeScreen /> : <UserTypeOptions />}
+          {!userType ? <HomeScreen /> : <UserTypeOptions />}
         </Route>
       </Switch>
     </Router>
